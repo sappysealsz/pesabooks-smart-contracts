@@ -10,19 +10,23 @@ The project consists of the following contracts:
 
 ### PoolSafe.sol
 
-The `PoolSafe` contract is responsible for securely holding and managing the funds in the Pesabooks platform. It provides basic functionality for depositing and withdrawing funds. Users do not interact directly with the `PoolSafe` contract; instead, they interact with the `Controller` contract. The `PoolSafe` contract always checks if the calling controller is authorized by verifying it through the `Registry` contract. 
+The `PoolSafe` contract is responsible for securely holding and managing the funds of a pool. It provides functions to check the balance of tokens in the pool, manage admin roles, and execute delegate calls to the other contracts registered in the `Registry`  through the function `relayCall`.  
+
+Only the authorized controller can invoke the `relayCall` function in the `PoolSafe` contract, adding an extra layer of safety and access control.
 
 For further details, please refer to the [PoolSafe.sol](src/PoolSafe.sol) file.
 
 ### Controller.sol
 
-The `Controller` contract acts as an intermediary between users and the `PoolSafe` contract. It contains the business logic and handles user interactions such as depositing and withdrawing funds. The `Controller` contract calls the `PoolSafe` contract through a relay call, ensuring the upgradability of the platform. By separating the logic into the `Controller` contract, it becomes easier to update and add new features without compromising the security of the funds stored in the `PoolSafe`.
+The `Controller` contract acts as an intermediary and implements the business logic for interactions between users and the `PoolSafe` contract. Users can deposit and withdraw funds by calling the `Controller` contract, which then executes delegate calls to the `PoolSafe` contract.
+
+By separating fund management from the core logic, the contract architecture allows for code upgradability. This means that the core logic of the pool can be updated without affecting the fund management functionalities. The delegation of functions from the `Controller` to the `PoolSafe` contract ensures that any future upgrades or changes to the core logic do not require modifying the fund management code.
 
 For more information, refer to the [Controller.sol](src/Controller.sol) file.
 
 ### Registry.sol
 
-The `Registry` contract serves as a central registry for storing the addresses of authorized contracts (controllers). 
+The `Registry` contract serves as a central registry for storing the addresses of authorized contracts like the auhtorized controller that can make delegate call to the pools safe, and other contracts that can be called via the delegate call. 
 
 For more information, refer to the [Registry.sol](src/Registry.sol) file.
 
